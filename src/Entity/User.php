@@ -7,10 +7,12 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,14 +22,17 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $mail = null;
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $mdp = null;
+    #[ORM\Column]
+    private ?string $password = null;
 
     #[ORM\Column]
     private ?int $phone = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     // Relation ManyToMany pour les équipes auxquelles l'utilisateur appartient
     #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
@@ -56,31 +61,28 @@ class User
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
-    public function getMail(): ?string
+    public function getEmail(): ?string
     {
-        return $this->mail;
+        return $this->email;
     }
 
-    public function setMail(string $mail): static
+    public function setEmail(string $email): static
     {
-        $this->mail = $mail;
-
+        $this->email = $email;
         return $this;
     }
 
-    public function getMdp(): ?string
+    public function getPassword(): ?string
     {
-        return $this->mdp;
+        return $this->password;
     }
 
-    public function setMdp(string $mdp): static
+    public function setPassword(string $password): static
     {
-        $this->mdp = $mdp;
-
+        $this->password = $password;
         return $this;
     }
 
@@ -92,8 +94,32 @@ class User
     public function setPhone(int $phone): static
     {
         $this->phone = $phone;
-
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        // Ajout automatique du rôle utilisateur par défaut
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    public function eraseCredentials() : void
+    {
+        // Nettoyage des informations sensibles si nécessaire
+    }
+
+    public function getUserIdentifier(): string
+    {
+        // Retourne l'identifiant unique de l'utilisateur
+        return $this->email;
     }
 
     public function getTeams(): Collection
@@ -105,18 +131,16 @@ class User
     {
         if (!$this->teams->contains($team)) {
             $this->teams[] = $team;
-            $team->addMember($this);  // Mise à jour de la relation inverse dans Team
+            $team->addMember($this); // Mise à jour relation inverse
         }
-
         return $this;
     }
 
     public function removeTeam(Team $team): static
     {
         if ($this->teams->removeElement($team)) {
-            $team->removeMember($this);  // Mise à jour de la relation inverse dans Team
+            $team->removeMember($this); // Mise à jour relation inverse
         }
-
         return $this;
     }
 
@@ -129,9 +153,8 @@ class User
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
-            $task->setUser($this);  // Mise à jour de la relation inverse dans Task
+            $task->setUser($this); // Mise à jour relation inverse
         }
-
         return $this;
     }
 
@@ -139,12 +162,13 @@ class User
     {
         if ($this->tasks->removeElement($task)) {
             if ($task->getUser() === $this) {
-                $task->setUser(null);  // Mise à jour de la relation inverse dans Task
+                $task->setUser(null); // Mise à jour relation inverse
             }
         }
-
         return $this;
     }
 }
+
+
 
 
