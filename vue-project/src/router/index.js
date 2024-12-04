@@ -1,23 +1,17 @@
-import Login from '@/views/Login.vue' // Assurez-vous que le chemin est correct
-import Register from '@/views/Register.vue' // Importez votre page Register.vue
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
+import Register from '../views/Register.vue'; // Assurez-vous que ce fichier existe
 
 const routes = [
   {
-    path: '/login',
-    name: 'Login',
-    component: Login,
-  },
-  {
     path: '/register',
     name: 'Register',
-    component: Register, // Ajoutez la route pour la page d'enregistrement
+    component: Register,  // La page Register
   },
   // Ajoutez d'autres routes ici si nécessaire
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 })
 
