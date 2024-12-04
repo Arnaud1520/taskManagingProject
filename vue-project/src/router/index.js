@@ -7,12 +7,12 @@ const routes = [
     name: 'Register',
     component: Register,  // La page Register
   },
-  // autres routes...
-];
+  // Ajoutez d'autres routes ici si nécessaire
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
-export default router;
+export default router
