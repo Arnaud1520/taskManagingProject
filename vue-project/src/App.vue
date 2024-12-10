@@ -7,7 +7,8 @@
     <div class="wrapper">
       <!-- Ajouter les liens vers la page de connexion et la page d'enregistrement -->
       <router-link to="/login" class="link">Login</router-link>
-      <router-link to="/register" class="link register">Register</router-link>  <!-- Ajouter la classe "register" pour le bouton Register -->
+      <router-link to="/register" class="link register">Register</router-link>
+      <!-- Ajouter la classe "register" pour le bouton Register -->
     </div>
 
     <!-- Le contenu de la page actuelle sera affiché ici -->
@@ -19,4 +20,5 @@
 // Vous pouvez importer des composants ici si nécessaire
 </script>
 
-<style src="./assets/styles.css"></style> <!-- Importation du fichier CSS externe -->
+<style src="./assets/styles.css"></style>
+<!-- Importation du fichier CSS externe -->
