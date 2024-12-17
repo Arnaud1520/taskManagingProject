@@ -12,11 +12,23 @@
       </div>
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <input type="password" v-model="password" id="password" required placeholder="Entrez votre mot de passe" />
+        <input
+          type="password"
+          v-model="password"
+          id="password"
+          required
+          placeholder="Entrez votre mot de passe"
+        />
       </div>
       <div class="form-group">
         <label for="phone">Téléphone</label>
-        <input type="text" v-model="phone" id="phone" required placeholder="Entrez votre numéro de téléphone" />
+        <input
+          type="text"
+          v-model="phone"
+          id="phone"
+          required
+          placeholder="Entrez votre numéro de téléphone"
+        />
       </div>
       <button type="submit" class="submit-btn">S'inscrire</button>
     </form>
@@ -24,8 +36,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-import '../assets/RegisterForm.css'; // Importation du fichier CSS
+import axios from 'axios'
+import '../assets/RegisterForm.css' // Importation du fichier CSS
 
 export default {
   data() {
@@ -34,7 +46,7 @@ export default {
       email: '',
       password: '',
       phone: '',
-    };
+    }
   },
   methods: {
     async register() {
@@ -44,15 +56,15 @@ export default {
           email: this.email,
           password: this.password,
           phone: this.phone,
-        });
+        })
 
-        console.log(response.data.message);  // Afficher le message de succès
+        console.log(response.data.message) // Afficher le message de succès
         // Vous pouvez ajouter une redirection vers la page de connexion ou un message de succès ici
       } catch (error) {
-        console.error('Error registering user:', error.response.data);
+        console.error('Error registering user:', error.response.data)
         // Afficher un message d'erreur à l'utilisateur
       }
     },
   },
-};
+}
 </script>
