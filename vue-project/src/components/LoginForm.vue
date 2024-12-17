@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   data() {
     return {
@@ -28,27 +30,17 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await fetch('http://localhost:8000/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: this.email,
-            password: this.password,
-          }),
+        const response = await axios.post('http://localhost:8000/api/login', {
+          email: this.email,
+          password: this.password,
         })
 
-        if (!response.ok) {
-          const errorData = await response.json()
-          this.error = errorData.error || 'Connexion échouée'
-        } else {
-          const data = await response.json()
-          console.log('Connexion réussie', data)
-          // Stockez le token JWT ou la session utilisateur ici
+        if (response.data.message === 'Connexion réussie.') {
+          // Gérer la connexion réussie (par exemple, stocker le token ou rediriger l'utilisateur)
+          this.$router.push('/dashboard')
         }
       } catch (e) {
-        this.error = 'Erreur lors de la connexion'
+        this.error = e.response?.data?.message || 'Erreur lors de la connexion'
       }
     },
   },

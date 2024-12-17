@@ -6,7 +6,7 @@
   <main>
     <div class="wrapper">
       <!-- Ajouter les liens vers la page de connexion et la page d'enregistrement -->
-      <router-link to="/login" class="link">Login</router-link>
+      <router-link to="/login" class="link login">Login</router-link>
       <router-link to="/register" class="link register">Register</router-link>
       <!-- Ajouter la classe "register" pour le bouton Register -->
     </div>
