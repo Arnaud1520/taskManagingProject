@@ -1,29 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Dashboard from '../views/Dashboard.vue'; // Assurez-vous d'importer le bon fichier Dashboard
-import Login from '../views/Login.vue'; // Assurez-vous que ce fichier existe
+import UserProfile from '../components/UserProfile.vue';
+import LoginPage from '../views/Login.vue';
 import Register from '../views/Register.vue'; // Assurez-vous que ce fichier existe
+
 
 const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: Register, // La page d'inscription
+    component: Register,  // La page Register
+
+    
   },
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login, // La page de connexion
-  },
-  {
-    path: '/',
-    redirect: '/login', // Redirige vers la page de connexion par défaut
-  },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard, // Le bon composant pour le dashboard
-  },
-  // Ajoutez d'autres routes ici si nécessaire
+  { path: '/profile/:name', name: 'UserProfile', component: UserProfile, props: true },
+  { path: '/login', name: 'LoginPage', component: LoginPage },
+
+  // autres routes...
 ];
 
 const router = createRouter({

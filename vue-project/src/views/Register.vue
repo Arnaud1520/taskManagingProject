@@ -21,6 +21,17 @@
         />
       </div>
       <div class="form-group">
+        <label for="confirm-password">Confirmez le mot de passe</label>
+        <input 
+          type="password" 
+          v-model="confirmPassword" 
+          id="confirm-password" 
+          required 
+          placeholder="Confirmez votre mot de passe" 
+        />
+        <span v-if="passwordMismatch" class="error-message">Les mots de passe ne correspondent pas.</span>
+      </div>
+      <div class="form-group">
         <label for="phone">Téléphone</label>
         <input
           type="text"
@@ -30,14 +41,18 @@
           placeholder="Entrez votre numéro de téléphone"
         />
       </div>
-      <button type="submit" class="submit-btn">S'inscrire</button>
+
+      <!-- Cacher le bouton une fois l'utilisateur inscrit -->
+      <button v-if="!isRegistered" type="submit" class="submit-btn" :disabled="passwordMismatch">S'inscrire</button>
     </form>
+
+    
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import '../assets/RegisterForm.css' // Importation du fichier CSS
+import axios from 'axios';
+import '../assets/RegisterForm.css';
 
 export default {
   data() {
@@ -45,11 +60,23 @@ export default {
       name: '',
       email: '',
       password: '',
+      confirmPassword: '',
       phone: '',
-    }
+      isRegistered: false,  // Ajout d'un état pour vérifier si l'utilisateur est inscrit
+    };
+  },
+  computed: {
+    passwordMismatch() {
+      return this.password && this.confirmPassword && this.password !== this.confirmPassword;
+    },
   },
   methods: {
     async register() {
+      if (this.passwordMismatch) {
+        alert('Les mots de passe ne correspondent pas.');
+        return;
+      }
+
       try {
         const response = await axios.post('http://localhost:8000/api/register', {
           name: this.name,
@@ -58,11 +85,15 @@ export default {
           phone: this.phone,
         })
 
-        console.log(response.data.message) // Afficher le message de succès
-        // Vous pouvez ajouter une redirection vers la page de connexion ou un message de succès ici
+        const { name } = response.data;
+
+        // L'inscription est réussie, masquer les boutons et rediriger
+        this.isRegistered = true;
+        this.$router.push({ name: 'UserProfile', params: { name } });
+
       } catch (error) {
-        console.error('Error registering user:', error.response.data)
-        // Afficher un message d'erreur à l'utilisateur
+        console.error('Error registering user:', error.response.data);
+        alert('Erreur lors de l\'inscription.');
       }
     },
   },

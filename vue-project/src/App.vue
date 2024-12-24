@@ -1,8 +1,4 @@
 <template>
-  <header>
-    <!-- Logo visible uniquement sur les pages de login ou register -->
-    <img v-if="!isAuthenticated" alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-  </header>
 
   <main>
     <div class="wrapper">
