@@ -89,7 +89,7 @@ export default {
 
         // L'inscription est réussie, masquer les boutons et rediriger
         this.isRegistered = true;
-        this.$router.push({ name: 'UserProfile', params: { name } });
+        this.$router.push({ name: 'Dashboard', params: { name } });
 
       } catch (error) {
         console.error('Error registering user:', error.response.data);

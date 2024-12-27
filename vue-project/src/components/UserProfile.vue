@@ -25,8 +25,11 @@
         <!-- Nom de l'utilisateur -->
         <span class="username">{{ name }}</span>
 
-        <!-- Bouton de déconnexion -->
-        <button class="logout-btn" @click="logout">Déconnexion</button>
+        <!-- Boutons d'action -->
+        <div class="action-buttons">
+          <!-- Bouton de déconnexion -->
+          <button class="logout-btn" @click="logout">Déconnexion</button>    
+        </div>
       </div>
 
       <!-- Message de bienvenue -->
@@ -65,6 +68,7 @@
   </div>
 </template>
 
+
 <script>
 export default {
   props: ['name'],
@@ -93,8 +97,17 @@ export default {
       // Logique pour ajouter une nouvelle tâche
       console.log("Ajouter une nouvelle tâche !");
     },
+    goToTeams() {
+      // Redirection vers la page des équipes
+      console.log("Redirection vers la page des équipes...");
+      this.$router.push({ name: 'TeamPage' }); // Assurez-vous que la route "TeamPage" est définie dans votre routeur.
+    },
   },
 };
 </script>
 
+
 <style src="../assets/UserProfile.css"></style>
+
+
+

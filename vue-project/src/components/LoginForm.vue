@@ -17,34 +17,44 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   data() {
     return {
       email: '',
       password: '',
-      error: null,
-    }
+      error: null, // Gestion des erreurs pour l'affichage
+    };
   },
   methods: {
     async login() {
       try {
         const response = await axios.post('http://localhost:8000/api/login', {
-          email: this.email,
+          email: this.email.trim(), // Supprime les espaces accidentels
           password: this.password,
-        })
+        });
 
         if (response.data.message === 'Connexion réussie.') {
-          // Gérer la connexion réussie (par exemple, stocker le token ou rediriger l'utilisateur)
-          this.$router.push('/dashboard')
+          // Sauvegarder le token d'authentification dans le localStorage (ou sessionStorage)
+          localStorage.setItem('authToken', response.data.token);
+
+          localStorage.setItem('user', JSON.stringify(response.data.user)); // Sauvegarde les infos utilisateur
+          
+          // Récupérer le nom de l'utilisateur
+          const userName = response.data.user.name;
+
+          // Rediriger vers le dashboard avec le nom de l'utilisateur
+          this.$router.push({ name: 'Dashboard', params: { name: userName } });
         }
       } catch (e) {
-        this.error = e.response?.data?.message || 'Erreur lors de la connexion'
+        // Gestion d'erreur avec un log clair
+        console.error('Erreur lors de la connexion :', e);
+        this.error = e.response?.data?.message || 'Erreur interne.';
       }
     },
   },
-}
+};
 </script>
 
 <style>
