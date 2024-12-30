@@ -9,9 +9,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -20,26 +24,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user:write'])]
     private ?string $password = null;
 
     #[ORM\Column]
+    #[Groups(['user:read', 'user:write'])]
     private ?int $phone = null;
 
     #[ORM\Column(type: 'json')]
+    #[Groups(['user:read', 'user:write'])]
     private array $roles = [];
 
-    // Relation ManyToMany pour les équipes auxquelles l'utilisateur appartient
-    #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
+    #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'members')]
+    #[Groups(['user:read'])]
     private Collection $teams;
 
-    // Relation OneToMany pour les tâches attribuées à l'utilisateur
-    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'user')]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
     private Collection $tasks;
 
     public function __construct()
@@ -99,7 +107,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        // Ajout automatique du rôle utilisateur par défaut
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
@@ -111,14 +118,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function eraseCredentials() : void
+    public function eraseCredentials(): void
     {
-        // Nettoyage des informations sensibles si nécessaire
     }
 
     public function getUserIdentifier(): string
     {
-        // Retourne l'identifiant unique de l'utilisateur
         return $this->email;
     }
 
@@ -131,16 +136,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->teams->contains($team)) {
             $this->teams[] = $team;
-            $team->addMember($this); // Mise à jour relation inverse
         }
         return $this;
     }
 
     public function removeTeam(Team $team): static
     {
-        if ($this->teams->removeElement($team)) {
-            $team->removeMember($this); // Mise à jour relation inverse
-        }
+        $this->teams->removeElement($team);
         return $this;
     }
 
@@ -153,7 +155,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
-            $task->setUser($this); // Mise à jour relation inverse
+            $task->setUser($this);
         }
         return $this;
     }
@@ -162,13 +164,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->tasks->removeElement($task)) {
             if ($task->getUser() === $this) {
-                $task->setUser(null); // Mise à jour relation inverse
+                $task->setUser(null);
             }
         }
         return $this;
     }
 }
-
-
 
 

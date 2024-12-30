@@ -5,8 +5,6 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 #[ApiResource]
@@ -18,47 +16,33 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
-
     #[ORM\Column]
-    private ?int $priority = null;
+    private ?\DateTimeImmutable $dueDate = null;
 
-    // Relation ManyToOne vers Team
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
+    private ?User $user = null;
+
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'tasks')]
-    #[ORM\JoinColumn(nullable: false)]
     private ?Team $team = null;
 
-    // Relation ManyToMany pour les dépendances entre tâches
-    #[ORM\ManyToMany(targetEntity: Task::class)]
-    #[ORM\JoinTable(name: 'task_dependencies')]
-    private Collection $dependencies;
-
-    public function __construct()
-    {
-        $this->dependencies = new ArrayCollection();
-    }
-
-    // Getters et setters...
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getName(): ?string
     {
-        return $this->title;
+        return $this->name;
     }
 
-    public function setTitle(string $title): static
+    public function setName(string $name): static
     {
-        $this->title = $title;
-
+        $this->name = $name;
         return $this;
     }
 
@@ -70,31 +54,28 @@ class Task
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getDueDate(): ?\DateTimeImmutable
     {
-        return $this->status;
+        return $this->dueDate;
     }
 
-    public function setStatus(string $status): static
+    public function setDueDate(\DateTimeImmutable $dueDate): static
     {
-        $this->status = $status;
-
+        $this->dueDate = $dueDate;
         return $this;
     }
 
-    public function getPriority(): ?int
+    public function getUser(): ?User
     {
-        return $this->priority;
+        return $this->user;
     }
 
-    public function setPriority(int $priority): static
+    public function setUser(?User $user): static
     {
-        $this->priority = $priority;
-
+        $this->user = $user;
         return $this;
     }
 
@@ -106,31 +87,6 @@ class Task
     public function setTeam(?Team $team): static
     {
         $this->team = $team;
-
-        return $this;
-    }
-
-    // Gestion des dépendances
-    public function getDependencies(): Collection
-    {
-        return $this->dependencies;
-    }
-
-    public function addDependency(Task $task): static
-    {
-        if (!$this->dependencies->contains($task)) {
-            $this->dependencies[] = $task;
-        }
-
-        return $this;
-    }
-
-    public function removeDependency(Task $task): static
-    {
-        $this->dependencies->removeElement($task);
-
         return $this;
     }
 }
-
-
