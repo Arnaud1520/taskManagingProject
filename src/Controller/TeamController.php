@@ -1,23 +1,33 @@
 <?php
 
+// src/Controller/TeamController.php
+
 namespace App\Controller;
 
 use App\Entity\Team;
-use App\Form\TeamType; // Si tu utilises un formulaire
+use App\Entity\User;  // Assurez-vous d'importer l'entité User
 use App\Repository\TeamRepository;
+use Doctrine\ORM\EntityManagerInterface; // Importer l'EntityManagerInterface
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class TeamController extends AbstractController
 {
-    #[Route('/api/teams', name: 'api_teams_create', methods: ['POST'])]
-    public function createTeam(Request $request, SerializerInterface $serializer): JsonResponse
+    private $entityManager;
+
+    // Injection de l'EntityManagerInterface dans le constructeur
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $data = json_decode($request->getContent(), true); // Récupérer les données envoyées en POST
+        $this->entityManager = $entityManager;
+    }
+
+    #[Route('/api/teams', name: 'api_teams_create', methods: ['POST'])]
+    public function createTeam(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
 
         if (!$data) {
             return new JsonResponse(['message' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
@@ -34,9 +44,8 @@ class TeamController extends AbstractController
         $team->setDescription($data['description']);
 
         // Enregistrer l'équipe dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($team);
-        $entityManager->flush();
+        $this->entityManager->persist($team);
+        $this->entityManager->flush();
 
         return new JsonResponse([
             'message' => 'Équipe créée avec succès',
@@ -48,23 +57,6 @@ class TeamController extends AbstractController
         ], Response::HTTP_CREATED);
     }
 
-    #[Route('/api/teams', name: 'api_teams_list', methods: ['GET'])]
-    public function getTeams(TeamRepository $teamRepository): JsonResponse
-    {
-        $teams = $teamRepository->findAll();
-
-        $teamsData = [];
-        foreach ($teams as $team) {
-            $teamsData[] = [
-                'id' => $team->getId(),
-                'name' => $team->getName(),
-                'description' => $team->getDescription(),
-            ];
-        }
-
-        return new JsonResponse(['teams' => $teamsData]);
-    }
-
     #[Route('/api/teams/{id}', name: 'api_teams_show', methods: ['GET'])]
     public function getTeam(Team $team): JsonResponse
     {
@@ -72,11 +64,63 @@ class TeamController extends AbstractController
             return new JsonResponse(['message' => 'Équipe non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
+        $membersData = $this->getMembersData($team);
+
         return new JsonResponse([
             'id' => $team->getId(),
             'name' => $team->getName(),
             'description' => $team->getDescription(),
+            'members' => $membersData,
         ]);
+    }
+
+    #[Route('/api/teams/{id}/add_member', name: 'api_teams_add_member', methods: ['POST'])]
+    public function addMemberToTeam(Request $request, Team $team): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['user_id'])) {
+            return new JsonResponse(['message' => 'L\'ID de l\'utilisateur est obligatoire.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $userId = $data['user_id'];
+
+        // Récupérer l'utilisateur par son ID
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Ajouter l'utilisateur à l'équipe
+        $team->addMember($user);  // Assurez-vous que la méthode `addMember()` existe dans l'entité Team
+        $this->entityManager->flush();
+
+        // Récupérer les membres mis à jour
+        $membersData = $this->getMembersData($team);
+
+        return new JsonResponse([
+            'message' => 'Membre ajouté avec succès',
+            'team' => [
+                'id' => $team->getId(),
+                'name' => $team->getName(),
+                'description' => $team->getDescription(),
+                'members' => $membersData,
+            ]
+        ]);
+    }
+
+    private function getMembersData(Team $team): array
+    {
+        $members = $team->getMembers();  // Assurez-vous que cette méthode retourne les membres
+        $membersData = [];
+        foreach ($members as $member) {
+            $membersData[] = [
+                'id' => $member->getId(),
+                'name' => $member->getName(),
+                'email' => $member->getEmail(),
+            ];
+        }
+        return $membersData;
     }
 
     #[Route('/api/teams/{id}', name: 'api_teams_update', methods: ['PUT'])]
@@ -86,7 +130,7 @@ class TeamController extends AbstractController
             return new JsonResponse(['message' => 'Équipe non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode($request->getContent(), true); // Récupérer les données envoyées en PUT
+        $data = json_decode($request->getContent(), true);
 
         if (isset($data['name'])) {
             $team->setName($data['name']);
@@ -95,9 +139,7 @@ class TeamController extends AbstractController
             $team->setDescription($data['description']);
         }
 
-        // Enregistrer les modifications dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
+        $this->entityManager->flush();
 
         return new JsonResponse([
             'message' => 'Équipe mise à jour avec succès',
@@ -116,11 +158,9 @@ class TeamController extends AbstractController
             return new JsonResponse(['message' => 'Équipe non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($team);
-        $entityManager->flush();
+        $this->entityManager->remove($team);
+        $this->entityManager->flush();
 
         return new JsonResponse(['message' => 'Équipe supprimée avec succès'], Response::HTTP_NO_CONTENT);
     }
 }
-

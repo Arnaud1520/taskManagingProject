@@ -103,40 +103,41 @@
 
         <div class="teams-container">
           <div v-for="team in teams" :key="team.id" class="team-card">
-            <i class="edit-icon fas fa-pen" @click="editTeam(team.id)"></i>
+            <i class="edit-icon fas fa-pen" @click="openEditTeamForm(team)"></i>
             <i class="delete-icon fas fa-trash-alt" @click="deleteTeam(team.id)"></i>
             <h3>{{ team.name }}</h3>
             <p>{{ team.description }}</p>
             <p><strong>Membres:</strong> 
-    <span v-if="team.membersData && team.membersData.length > 0">
-      {{ team.membersData.join(', ') }}
-    </span>
-    <span v-else>Aucun</span>
-  </p>
+              <span v-if="team.membersData && team.membersData.length > 0">
+                {{ team.membersData.join(', ') }}
+              </span>
+              <span v-else>Aucun</span>
+            </p>
 
-            <button @click="showAddMembersForm(team.id)">Ajouter des membres</button>
+            <button @click="showAddMembersForm(team)">Ajouter des membres</button>
           </div>
         </div>
       </section>
 
       <!-- Pop-up pour ajouter des membres à une équipe -->
-      <div v-if="showAddMembersFormVisible" class="popup-overlay" @click.self="showAddMembersFormVisible = false">
-        <div class="popup">
-          <h3>Ajouter des membres à l'équipe</h3>
-          <form @submit.prevent="addMembersToTeam">
-            <div>
-              <label for="members">Sélectionner des membres :</label>
-              <select id="members" v-model="selectedMembers" multiple>
-                <option v-for="user in users" :key="user.id" :value="user.id">
-                  {{ "Membre : " + user.name }}
-                </option>
-              </select>
-            </div>
-            <button type="submit">Ajouter</button>
-            <button type="button" @click="showAddMembersFormVisible = false">Annuler</button>
-          </form>
-        </div>
+<div v-if="showAddMembersFormVisible" class="popup-overlay" @click.self="showAddMembersFormVisible = false">
+  <div class="popup">
+    <h3>Ajouter des membres à l'équipe</h3>
+    <form @submit.prevent="addMembersToTeam">
+      <div>
+        <label for="members">Sélectionner un membre :</label>
+        <select id="members" v-model="selectedMember" multiple @change="logSelectedMember"> <!-- On retire 'multiple' et on utilise v-model sur selectedMember -->
+          <option v-for="user in users" :key="user['@id']" :value="user['@id']">
+            {{ user.name }}
+          </option>
+        </select>
       </div>
+      <button type="submit">Ajouter</button>
+      <button type="button" @click="showAddMembersFormVisible = false">Annuler</button>
+    </form>
+  </div>
+</div>
+
 
       <!-- Pop-up pour ajouter une tâche -->
       <div v-if="showAddForm" class="popup-overlay" @click.self="showAddForm = false">
@@ -174,16 +175,29 @@
           </form>
         </div>
       </div>
+
+      <!-- Formulaire d'édition d'une équipe -->
+      <div v-if="showEditTeamForm" class="popup-overlay" @click.self="showEditTeamForm = false">
+        <div class="popup">
+          <h3>Modifier l'équipe</h3>
+          <form @submit.prevent="updateTeam">
+            <div>
+              <label for="editTeamName">Nom de l'équipe :</label>
+              <input type="text" id="editTeamName" v-model="editTeamData.name" required />
+            </div>
+            <div>
+              <label for="editTeamDescription">Description :</label>
+              <textarea id="editTeamDescription" v-model="editTeamData.description" required></textarea>
+            </div>
+            <button type="submit">Mettre à jour</button>
+            <button type="button" @click="showEditTeamForm = false">Annuler</button>
+          </form>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
-
-
-
-
-
-
-
 
 <script>
 import axios from "axios";
@@ -198,6 +212,7 @@ export default {
       showEditForm: false,
       showEditTeamForm: false,
       showAddMembersFormVisible: false, // Propriété ajoutée pour le formulaire d'ajout de membres
+      selectedMember: [], // Ajout de la propriété selectedMember
       newTeam: {
         name: "",
         description: "",
@@ -247,7 +262,7 @@ export default {
     async fetchTeams() {
       try {
         const response = await axios.get("http://localhost:8000/api/teams");
-        console.log(response.data);  // Affiche la réponse complète de l'API
+        //console.log(response.data);  // Affiche la réponse complète de l'API
         this.teams = response.data.member || [];
 
         // Vérification de la structure des membres et récupération des données des utilisateurs
@@ -292,6 +307,12 @@ export default {
     openEditTaskForm(task) {
       this.editTaskData = { ...task };
       this.showEditForm = true;
+    },
+    openEditTeamForm(team) {
+      // Copie des données de l'équipe à éditer
+      this.editTeamData = { ...team };
+      // Affiche le formulaire d'édition de l'équipe
+      this.showEditTeamForm = true;
     },
     async createTask() {
       try {
@@ -365,8 +386,16 @@ export default {
         }
         this.showEditTeamForm = false;
       } catch (error) {
-        console.error("Erreur lors de la mise à jour de l'équipe:", error);
-      }
+    // Afficher l'erreur complète
+    if (error.response) {
+      console.error("Erreur lors de la mise à jour de l'équipe:", error.response.status);
+      console.error("Détails de l'erreur:", error.response.data);
+    } else if (error.request) {
+      console.error("Aucune réponse du serveur:", error.request);
+    } else {
+      console.error("Erreur:", error.message);
+    }
+  }
     },
     async deleteTeam(id) {
       try {
@@ -376,6 +405,56 @@ export default {
         console.error("Erreur lors de la suppression de l'équipe:", error);
       }
     },
+    async addMembersToTeam() {
+  try {
+    // Vérifie que l'ID de l'équipe est bien défini
+    if (!this.editTeamData.id) {
+      console.error("ID de l'équipe non trouvé.");
+      return;
+    }
+
+    // Vérifie si des membres ont été sélectionnés
+    if (!Array.isArray(this.selectedMember) || this.selectedMember.length === 0) {
+      console.error("Aucun membre sélectionné.");
+      return;
+    }
+
+    // Log des membres sélectionnés avant l'extraction des IDs
+    console.log("Membres sélectionnés avant extraction des IDs : ", this.selectedMember);
+
+    // Mappe les URI pour extraire uniquement les IDs
+    const memberIds = this.selectedMember.map(memberUri => {
+      // Extrait l'ID de l'URI '/api/users/{id}'
+      const id = memberUri.split('/').pop();
+      return id;
+    });
+
+    console.log("IDs des membres sélectionnés : ", memberIds);
+
+    // Envoi de la requête pour chaque utilisateur sélectionné
+    for (const memberId of memberIds) {
+      console.log(`Envoi de la requête pour l'utilisateur avec l'ID : ${memberId}`);
+
+      const response = await axios.post(
+        `http://localhost:8000/api/teams/${this.editTeamData.id}/add_member`,
+        { user_id: memberId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(`Membre ajouté : ${memberId}`, response.data);
+    }
+
+    // Ferme la fenêtre et recharge les équipes
+    this.showAddMembersFormVisible = false;
+    await this.fetchTeams();
+  } catch (error) {
+    console.error("Erreur lors de l'ajout des membres à l'équipe :", error.response || error);
+  }
+},
     resetTaskForm() {
       this.newTask = {
         title: "",
@@ -393,25 +472,22 @@ export default {
       };
     },
     // Nouvelle méthode pour afficher le formulaire d'ajout de membres
-    showAddMembersForm(teamId) {
+    showAddMembersForm(team) {
       this.showAddMembersFormVisible = true; // Affiche le formulaire
+      this.editTeamData = { ...team }; // Assure que l'ID de l'équipe est correctement défini
     },
-    addMembersToTeam() {
-      // Logique pour ajouter des membres à l'équipe
-      this.showAddMembersFormVisible = false; // Ferme le formulaire
-    },
+    logSelectedMember() {
+  console.log("Membres sélectionnés :", JSON.parse(JSON.stringify(this.selectedMember)));
+},
   },
   async mounted() {
+    //console.log("Liste des utilisateurs :", this.users);
     await this.fetchTasks();
     await this.fetchTeams();
     await this.fetchUsers(); // Récupère les utilisateurs pour gérer les membres d'équipe
   },
 };
 </script>
-
-
-
-
 
 
 
