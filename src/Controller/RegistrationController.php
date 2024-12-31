@@ -45,6 +45,9 @@ class RegistrationController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Inscription réussie.'], 201);
+        return new JsonResponse([
+            'message' => 'Inscription réussie.',
+            'name' => $user->getName(),
+        ], 201);
     }
 }

@@ -39,4 +39,14 @@ class UserController extends AbstractController
 
         return new JsonResponse(['message' => 'User created successfully'], JsonResponse::HTTP_CREATED);
     }
+
+    #[Route('/api/users', methods: ['GET'], name: 'get_users')]
+    public function getUsers(UserRepository $userRepository): JsonResponse
+    {
+        // Récupérer la liste des utilisateurs
+        $users = $userRepository->findAll();
+
+        // Retourner les utilisateurs au format JSON
+        return new JsonResponse($users);
+    }
 }

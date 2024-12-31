@@ -23,13 +23,10 @@ class Team
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    // Relation ManyToMany pour les membres de l'équipe
-    #[ORM\ManyToMany(targetEntity: User::class)]
-    #[ORM\JoinTable(name: 'team_members')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'teams')]
     private Collection $members;
 
-    // Relation OneToMany pour les tâches de l'équipe
-    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'team')]
+    #[ORM\OneToMany(mappedBy: 'team', targetEntity: Task::class)]
     private Collection $tasks;
 
     public function __construct()
@@ -51,7 +48,6 @@ class Team
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -63,7 +59,6 @@ class Team
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -76,15 +71,16 @@ class Team
     {
         if (!$this->members->contains($user)) {
             $this->members[] = $user;
+            $user->addTeam($this);
         }
-
         return $this;
     }
 
     public function removeMember(User $user): static
     {
-        $this->members->removeElement($user);
-
+        if ($this->members->removeElement($user)) {
+            $user->removeTeam($this);
+        }
         return $this;
     }
 
@@ -97,22 +93,18 @@ class Team
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
-            $task->setTeam($this); // Assure la mise à jour de la relation inverse
+            $task->setTeam($this);
         }
-
         return $this;
     }
 
     public function removeTask(Task $task): static
     {
         if ($this->tasks->removeElement($task)) {
-            // On s'assure que la relation inverse est bien supprimée
             if ($task->getTeam() === $this) {
                 $task->setTeam(null);
             }
         }
-
         return $this;
     }
 }
-
