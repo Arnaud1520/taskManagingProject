@@ -65,26 +65,36 @@ public function createTask(Request $request, EntityManagerInterface $entityManag
 }
 
 
-    #[Route('/api/tasks/{id}', methods: ['PUT'], name: 'update_task')]
-    public function updateTask(int $id, Request $request, TaskRepository $taskRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $task = $taskRepository->find($id);
+#[Route('/api/tasks/{id}', methods: ['PUT'], name: 'update_task')]
+public function updateTask(int $id, Request $request, TaskRepository $taskRepository, EntityManagerInterface $entityManager): JsonResponse {
+    $task = $taskRepository->find($id);
 
-        if (!$task) {
-            return $this->json(['error' => 'Task not found'], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-
-        $task->setName($data['name'] ?? $task->getName()); // Utiliser "name"
-        $task->setDescription($data['description'] ?? $task->getDescription());
-        $task->setPriority($data['priority'] ?? $task->getPriority());
-        $task->setStatus($data['status'] ?? $task->getStatus());
-
-        $entityManager->flush();
-
-        return $this->json($task, 200, [], ['groups' => 'task:read']);
+    if (!$task) {
+        return $this->json(['error' => 'Task not found'], 404);
     }
+
+    $data = json_decode($request->getContent(), true);
+
+    $task->setName($data['name'] ?? $task->getName());
+    $task->setDescription($data['description'] ?? $task->getDescription());
+    $task->setPriority($data['priority'] ?? $task->getPriority());
+    $task->setStatus($data['status'] ?? $task->getStatus());
+
+    // Gestion de la mise à jour de l'équipe
+    if (isset($data['team_id'])) {
+        $team = $entityManager->getRepository(Team::class)->find($data['team_id']);
+        if ($team) {
+            $task->setTeam($team);
+        } else {
+            return $this->json(['error' => 'Team not found'], 404);
+        }
+    }
+
+    $entityManager->flush();
+
+    return $this->json($task, 200, [], ['groups' => 'task:read']);
+}
+
 
     #[Route('/api/tasks/{id}', methods: ['DELETE'], name: 'delete_task')]
     public function deleteTask(int $id, TaskRepository $taskRepository, EntityManagerInterface $entityManager): JsonResponse

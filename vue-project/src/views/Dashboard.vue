@@ -176,6 +176,7 @@
         </div>
       </div>
 
+      
       <!-- Formulaire d'édition d'une équipe -->
       <div v-if="showEditTeamForm" class="popup-overlay" @click.self="showEditTeamForm = false">
         <div class="popup">
@@ -197,6 +198,82 @@
 
     </div>
   </div>
+ <!-- Formulaire d'édition d'une tâche -->
+<div v-if="showEditForm" class="popup-overlay" @click.self="showEditForm = false">
+  <div class="popup">
+    <h3>Modifier une tâche</h3>
+    <form @submit.prevent="updateTask">
+      <!-- Champ pour le titre de la tâche -->
+      <div class="form-group">
+        <label for="editTaskName">Titre :</label>
+        <input
+          type="text"
+          id="editTaskName"
+          v-model="editTaskData.name"
+          placeholder="Entrez le titre de la tâche"
+          required
+        />
+      </div>
+
+      <!-- Champ pour la description de la tâche -->
+      <div class="form-group">
+        <label for="editTaskDescription">Description :</label>
+        <textarea
+          id="editTaskDescription"
+          v-model="editTaskData.description"
+          placeholder="Décrivez la tâche"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Champ pour la priorité -->
+      <div class="form-group">
+        <label for="editTaskPriority">Priorité :</label>
+        <input
+          type="number"
+          id="editTaskPriority"
+          v-model.number="editTaskData.priority"
+          min="1"
+          max="5"
+          placeholder="Priorité (1-5)"
+          required
+        />
+      </div>
+
+      <!-- Champ pour le statut -->
+      <div class="form-group">
+        <label for="editTaskStatus">Statut :</label>
+        <select id="editTaskStatus" v-model="editTaskData.status" required>
+          <option value="toDo">À faire</option>
+          <option value="inProgress">En cours</option>
+          <option value="done">Terminée</option>
+        </select>
+      </div>
+
+      <!-- Champ pour l'équipe -->
+      <div class="form-group">
+        <label for="editTaskTeam">Équipe :</label>
+        <select id="editTaskTeam" v-model="editTaskData.team_id" required>
+          <option v-for="team in teams" :key="team.id" :value="team.id">{{ team.name }}</option>
+        </select>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="showEditForm = false"
+        >
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    
 </template>
 
 <script>
