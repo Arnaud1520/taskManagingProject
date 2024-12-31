@@ -33,7 +33,7 @@
             <div class="task-card" v-for="task in filteredTasks('inProgress')" :key="task.id">
               <i class="edit-icon fas fa-pen" @click="openEditTaskForm(task)"></i>
               <i class="delete-icon fas fa-trash-alt" @click="deleteTask(task.id)"></i>
-              <h3>{{ task.title }}</h3>
+              <h3>{{ task.name }}</h3>
               <p>{{ task.description }}</p>
               <p><strong>Priorité:</strong> {{ task.priority }}</p>
               <p><strong>Status:</strong> {{ task.status }}</p>
@@ -49,7 +49,7 @@
             <div class="task-card" v-for="task in filteredTasks('toDo')" :key="task.id">
               <i class="edit-icon fas fa-pen" @click="openEditTaskForm(task)"></i>
               <i class="delete-icon fas fa-trash-alt" @click="deleteTask(task.id)"></i>
-              <h3>{{ task.title }}</h3>
+              <h3>{{ task.name }}</h3>
               <p>{{ task.description }}</p>
               <p><strong>Priorité:</strong> {{ task.priority }}</p>
               <p><strong>Status:</strong> {{ task.status }}</p>
@@ -65,7 +65,7 @@
             <div class="task-card" v-for="task in filteredTasks('done')" :key="task.id">
               <i class="edit-icon fas fa-pen" @click="openEditTaskForm(task)"></i>
               <i class="delete-icon fas fa-trash-alt" @click="deleteTask(task.id)"></i>
-              <h3>{{ task.title }}</h3>
+              <h3>{{ task.name }}</h3>
               <p>{{ task.description }}</p>
               <p><strong>Priorité:</strong> {{ task.priority }}</p>
               <p><strong>Status:</strong> {{ task.status }}</p>
@@ -145,8 +145,8 @@
           <h3>Ajouter une nouvelle tâche</h3>
           <form @submit.prevent="createTask">
             <div>
-              <label for="taskTitle">Titre :</label>
-              <input type="text" id="taskTitle" v-model="newTask.title" required />
+              <label for="taskName">Titre :</label>
+              <input type="text" id="taskName" v-model="newTask.name" required />
             </div>
             <div>
               <label for="taskDescription">Description :</label>
@@ -166,7 +166,7 @@
             </div>
             <div>
               <label for="taskTeam">Équipe :</label>
-              <select id="taskTeam" v-model="newTask.team_id" required>
+              <select id="taskTeam" v-model="newTask.team_id" required @change="logSelectedTask">
                 <option v-for="team in teams" :key="team.id" :value="team.id">{{ team.name }}</option>
               </select>
             </div>
@@ -225,7 +225,7 @@ export default {
         members: [], // Liste des membres de l'équipe
       },
       newTask: {
-        title: "",
+        name: "",
         description: "",
         priority: 1,
         status: "toDo",
@@ -233,7 +233,7 @@ export default {
       },
       editTaskData: {
         id: null,
-        title: "",
+        name: "",
         description: "",
         priority: 1,
         status: "toDo",
@@ -254,7 +254,7 @@ export default {
     async fetchTasks() {
       try {
         const response = await axios.get("http://localhost:8000/api/tasks");
-        this.tasks = response.data["hydra:member"];
+        this.tasks = response.data.member;
       } catch (error) {
         console.error("Erreur lors de la récupération des tâches:", error);
       }
@@ -314,18 +314,68 @@ export default {
       // Affiche le formulaire d'édition de l'équipe
       this.showEditTeamForm = true;
     },
+
     async createTask() {
-      try {
-        const response = await axios.post("http://localhost:8000/api/tasks", this.newTask);
-        this.tasks.push(response.data);
-        this.showAddForm = false;
-        this.resetTaskForm();
-      } catch (error) {
-        console.error("Erreur lors de la création de la tâche:", error);
+  try {
+    // Validation de la priorité
+    if (this.newTask.priority < 1 || this.newTask.priority > 5) {
+      console.error("La priorité doit être comprise entre 1 et 5.");
+      alert("La priorité doit être comprise entre 1 et 5."); // Message pour l'utilisateur
+      return;
+    }
+
+    // Données de la tâche
+    const taskData = {
+      name: this.newTask.name,
+      description: this.newTask.description,
+      priority: this.newTask.priority,
+      status: this.newTask.status,
+      team: `/api/teams/${this.newTask.team_id}`, // Assure-toi que c'est bien un IRI
+    };
+
+    console.log("Données envoyées :", taskData);
+
+    // Requête POST vers l'API
+    const response = await axios.post(
+      "http://localhost:8000/api/tasks",
+      taskData,
+      {
+        headers: {
+          "Content-Type": "application/ld+json",
+        },
       }
-    },
+    );
+
+    console.log("Tâche créée avec succès :", response.data);
+
+    // Réinitialise le formulaire
+    this.newTask = {
+      name: "",
+      description: "",
+      priority: 1,
+      status: "toDo",
+      team_id: null,
+    };
+
+    // Ferme le formulaire
+    this.showAddForm = false; // Assure-toi que tu as une variable comme `isFormOpen` pour contrôler l'affichage du formulaire
+  } catch (error) {
+    if (error.response) {
+      console.error("Erreur lors de la création de la tâche :", error.response.data);
+    } else {
+      console.error("Erreur réseau ou autre :", error.message);
+    }
+  }
+},
+    
     async updateTask() {
       try {
+        // Vérifie que la priorité est bien entre 1 et 5
+        if (this.editTaskData.priority < 1 || this.editTaskData.priority > 5) {
+          console.error("La priorité doit être entre 1 et 5.");
+          return;
+        }
+
         await axios.put(
           `http://localhost:8000/api/tasks/${this.editTaskData.id}`,
           this.editTaskData
@@ -420,7 +470,7 @@ export default {
     }
 
     // Log des membres sélectionnés avant l'extraction des IDs
-    console.log("Membres sélectionnés avant extraction des IDs : ", this.selectedMember);
+    //console.log("Membres sélectionnés avant extraction des IDs : ", this.selectedMember);
 
     // Mappe les URI pour extraire uniquement les IDs
     const memberIds = this.selectedMember.map(memberUri => {
@@ -457,7 +507,7 @@ export default {
 },
     resetTaskForm() {
       this.newTask = {
-        title: "",
+        name: "",
         description: "",
         priority: 1,
         status: "toDo",
@@ -478,7 +528,10 @@ export default {
     },
     logSelectedMember() {
   console.log("Membres sélectionnés :", JSON.parse(JSON.stringify(this.selectedMember)));
-},
+  },
+    logSelectedTask() {
+  console.log("Team sélectionnée :", JSON.parse(JSON.stringify(this.newTask.team_id)));
+  },
   },
   async mounted() {
     //console.log("Liste des utilisateurs :", this.users);

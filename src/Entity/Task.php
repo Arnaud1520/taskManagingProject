@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TaskRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 #[ApiResource]
@@ -16,19 +18,26 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['task:read'])]
     private ?string $name = null;
-
+    
     #[ORM\Column(length: 255)]
+    #[Groups(['task:read'])]
     private ?string $description = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $dueDate = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
-    private ?User $user = null;
-
+    // Relation ManyToOne avec Team
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'tasks')]
+    #[ORM\JoinColumn(name: 'team_id', referencedColumnName: 'id', nullable: false)] // Spécification explicite de la colonne
     private ?Team $team = null;
+
+    #[ORM\Column]
+    #[Groups(['task:read'])]
+    #[Assert\Range(min: 1, max: 5, notInRangeMessage: 'Priority must be between {{ min }} and {{ max }}')]
+    private ?int $priority = 1;
+    
+    #[ORM\Column(length: 255)]
+    #[Groups(['task:read'])]
+    private ?string $status = null;
 
     public function getId(): ?int
     {
@@ -57,28 +66,6 @@ class Task
         return $this;
     }
 
-    public function getDueDate(): ?\DateTimeImmutable
-    {
-        return $this->dueDate;
-    }
-
-    public function setDueDate(\DateTimeImmutable $dueDate): static
-    {
-        $this->dueDate = $dueDate;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-        return $this;
-    }
-
     public function getTeam(): ?Team
     {
         return $this->team;
@@ -87,6 +74,28 @@ class Task
     public function setTeam(?Team $team): static
     {
         $this->team = $team;
+        return $this;
+    }
+
+    public function getPriority(): ?int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): static
+    {
+        $this->priority = $priority;
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
         return $this;
     }
 }
