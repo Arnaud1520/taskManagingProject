@@ -1,6 +1,6 @@
 # Task Management API
 
-Ce projet est une API de gestion des tâches développée avec Symfony et API Platform. L'API permet aux utilisateurs de créer, récupérer et gérer des tâches, en associant chaque tâche à un utilisateur spécifique. Les tâches peuvent avoir une priorité, un statut, une description et peuvent être liées à d'autres tâches en tant que dépendances.
+Ce projet est une API de gestion des tâches développée avec Symfony API Platform et Vue.Js. L'API permet aux utilisateurs de créer, récupérer et gérer des tâches, en associant chaque tâche à un utilisateur spécifique. Les tâches peuvent avoir une priorité, un statut, une description et peuvent être liées à d'autres tâches en tant que dépendances.
 
 Fonctionnalités principales :
 Créer une tâche : L'utilisateur peut créer une tâche en spécifiant son titre, description, priorité, et statut.
