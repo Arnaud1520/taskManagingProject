@@ -1,61 +1,155 @@
 /* Style de base pour les liens */
 .link {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    color: white;
-    display: inline-block;
-    background-color: #007bff; /* Bleu pour le bouton Login */
-    text-decoration: none; /* Retirer la décoration de lien */
-    cursor: pointer;
-    transition: all 0.3s ease; /* Transition pour les animations */
+  padding: 8px 16px; /* Réduire la taille des boutons */
+  border-radius: 6px; /* Rayon des coins plus petit */
+  font-size: 1rem; /* Taille de police réduite */
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  display: inline-block;
+  background-color: #007bff; /* Bleu pour le bouton Login */
+  text-decoration: none; /* Retirer la décoration de lien */
+  cursor: pointer;
+  transition: all 0.3s ease; /* Transition pour les animations */
+}
+
+/* Couleur de fond pour le bouton Register */
+.link.register {
+  background-color: #28a745; /* Vert pour le bouton Register */
+}
+
+/* Effet de survol (hover) pour les liens */
+.link:hover {
+  background-color: #0056b3; /* Bleu plus foncé pour Login */
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3); /* Ombre douce */
+}
+
+/* Effet de survol (hover) pour le bouton Register */
+.link.register:hover {
+  background-color: #218838; /* Vert plus foncé pour Register */
+  box-shadow: 0 4px 12px rgba(0, 123, 0, 0.3); /* Ombre douce */
+}
+
+/* Effet au clic (active) pour les liens */
+.link:active {
+  background-color: #004085; /* Bleu encore plus foncé */
+  box-shadow: 0 2px 6px rgba(0, 0, 255, 0.5); /* Ombre au clic */
+}
+
+/* Effet au clic pour Register */
+.link.register:active {
+  background-color: #1e7e34; /* Vert encore plus foncé */
+  box-shadow: 0 2px 6px rgba(0, 123, 0, 0.5); /* Ombre au clic */
+}
+
+/* Positionnement en haut à droite */
+.wrapper {
+  display: flex;
+  justify-content: flex-end; /* Aligner à droite */
+  gap: 10px; /* Espacement réduit entre les boutons */
+  position: absolute;
+  top: 10px; /* Décalage depuis le haut de la page */
+  right: 20px; /* Décalage depuis la droite de la page */
+}
+
+/* Éléments d'en-tête */
+header {
+  line-height: 1.5;
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
+}
+.logout-button {
+  background-color: #ff4b5c; /* Rouge élégant */
+  color: white; /* Texte blanc pour contraste */
+  border: none; /* Pas de bordure */
+  padding: 12px 20px; /* Espacement intérieur */
+  border-radius: 8px; /* Coins arrondis */
+  font-size: 1rem; /* Taille du texte */
+  font-weight: bold; /* Texte en gras */
+  cursor: pointer; /* Curseur de clic */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  transition: all 0.3s ease; /* Animation pour le hover */
+}
+
+.logout-button:hover {
+  background-color: #d94350; /* Rouge un peu plus foncé au survol */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Augmentation de l'ombre */
+}
+
+.logout-button:active {
+  background-color: #c43741; /* Rouge encore plus sombre lors du clic */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Réduction de l'ombre */
+}
+body {
+  margin: auto;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: auto;
+  background: linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%);
+  animation: gradient 15s ease infinite;
+  background-size: 400% 400%;
+  background-attachment: fixed;
+}
+
+@keyframes gradient {
+  0% {
+      background-position: 0% 0%;
   }
-  
-  /* Couleur de fond pour le bouton Register */
-  .link.register {
-    background-color: #28a745; /* Vert pour le bouton Register */
+  50% {
+      background-position: 100% 100%;
   }
-  
-  /* Effet de survol (hover) pour les liens */
-  .link:hover {
-    background-color: #0056b3; /* Bleu plus foncé pour Login */
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3); /* Ombre douce */
+  100% {
+      background-position: 0% 0%;
   }
-  
-  /* Effet de survol (hover) pour le bouton Register */
-  .link.register:hover {
-    background-color: #218838; /* Vert plus foncé pour Register */
-    box-shadow: 0 4px 12px rgba(0, 123, 0, 0.3); /* Ombre douce */
+}
+
+.wave {
+  background: rgb(255 255 255 / 25%);
+  border-radius: 1000% 1000% 0 0;
+  position: fixed;
+  width: 200%;
+  height: 12em;
+  animation: wave 10s -3s linear infinite;
+  transform: translate3d(0, 0, 0);
+  opacity: 0.8;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.wave:nth-of-type(2) {
+  bottom: -1.25em;
+  animation: wave 18s linear reverse infinite;
+  opacity: 0.8;
+}
+
+.wave:nth-of-type(3) {
+  bottom: -2.5em;
+  animation: wave 20s -1s reverse infinite;
+  opacity: 0.9;
+}
+
+@keyframes wave {
+  2% {
+      transform: translateX(1);
   }
-  
-  /* Effet au clic (active) pour les liens */
-  .link:active {
-    background-color: #004085; /* Bleu encore plus foncé */
-    box-shadow: 0 2px 6px rgba(0, 0, 255, 0.5); /* Ombre au clic */
+
+  25% {
+      transform: translateX(-25%);
   }
-  
-  /* Effet au clic pour Register */
-  .link.register:active {
-    background-color: #1e7e34; /* Vert encore plus foncé */
-    box-shadow: 0 2px 6px rgba(0, 123, 0, 0.5); /* Ombre au clic */
+
+  50% {
+      transform: translateX(-50%);
   }
-  
-  header {
-    line-height: 1.5;
-    text-align: center;
+
+  75% {
+      transform: translateX(-25%);
   }
-  
-  .logo {
-    display: block;
-    margin: 0 auto 2rem;
+
+  100% {
+      transform: translateX(1);
   }
-  
-  .wrapper {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-  }
-  
+}

@@ -1,0 +1,45 @@
+.team-page {
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  .teams-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .team-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+  }
+  
+  .team-card h2 {
+    margin-bottom: 10px;
+  }
+  
+  .team-card p {
+    margin: 10px 0;
+  }
+  
+  .members {
+    margin-top: 20px;
+  }
+  
+  .member-card {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+  }
+  
+  .member-card p {
+    margin: 5px 0;
+  }
+  
+  .member-card strong {
+    color: #007bff;
+  }

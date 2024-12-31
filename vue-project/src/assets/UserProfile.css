@@ -1,0 +1,87 @@
+/* Style général pour la page de profil */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrer les éléments horizontalement */
+  justify-content: center; /* Centrer verticalement */
+  height: 100vh; /* Utiliser toute la hauteur de la fenêtre */
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  position: relative; /* Pour positionner l'avatar et le bouton en haut à gauche/droite */
+}
+
+/* Style pour le conteneur de l'avatar et du nom en haut à gauche */
+.profile-header {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Style pour l'avatar */
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px; /* Espacement entre l'avatar et le nom */
+  border: 2px solid #ddd; /* Bordure autour de l'avatar */
+}
+
+/* Style pour le nom de l'utilisateur */
+.username {
+  font-size: 24px;
+  font-weight: bold;
+  color: white; /* Couleur blanche */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 11px;
+  margin-left: 10px; /* Espacement entre le nom et le message de bienvenue */
+}
+
+/* Message de bienvenue centré au milieu */
+.welcome-message {
+  font-size: 32px; /* Texte plus grand */
+  text-align: center;
+  color: white; /* Couleur blanche */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Contours pour rendre le texte plus visible */
+  margin-top: 20px;
+  font-weight: bold; /* Texte en gras */
+}
+
+/* Bouton de déconnexion en haut à droite */
+.logout-btn {
+  position: fixed; /* Fixe le bouton en haut à droite, même en faisant défiler la page */
+  top: 20px; /* Décalage du haut */
+  right: 20px; /* Décalage de la droite */
+  background-color: #ff4d4d; /* Rouge pour indiquer une action de déconnexion */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+/* Style pour le bouton "Teams" */
+.team-btn {
+background-color: #007bff; /* Bleu */
+color: white;
+border: none;
+padding: 10px 20px;
+margin-left: 10px;
+border-radius: 5px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+font-size: 16px;
+font-weight: bold;
+}
+
+/* Effet au survol du bouton "Teams" */
+.team-btn:hover {
+background-color: #0056b3; /* Bleu plus foncé au survol */
+}
+
+/* Autres styles... */

@@ -1,0 +1,132 @@
+/* Styles globaux */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Container principal */
+  .login-container {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column; /* Titre et formulaire en colonne */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Titre */
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px; /* Espacement entre le titre et le formulaire */
+    text-align: center; /* Centrer le titre */
+  }
+  
+  /* Formulaire */
+  .login-form {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  /* Groupe de champs */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  /* Labels */
+  .form-group label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  /* Champs de saisie */
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Effet de focus sur les champs */
+  input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Bouton */
+  .submit-btn {
+    background-color: #007bff; /* Bleu */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Ombre douce */
+    outline: none;
+  }
+  
+  /* Effet de survol */
+  .submit-btn:hover {
+    background-color: #0056b3; /* Bleu plus foncé au survol */
+    transform: translateY(-2px); /* Légère élévation du bouton */
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3); /* Ombre plus marquée */
+  }
+  
+  /* Effet de clic */
+  .submit-btn:active {
+    background-color: #004085; /* Bleu encore plus foncé quand le bouton est cliqué */
+    transform: translateY(2px); /* Le bouton descend légèrement pour un effet de clic */
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15); /* Ombre légère au clic */
+  }
+  
+  /* Message d'erreur */
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  /* Bouton bleu */
+.submit-button {
+    background-color: #007bff; /* Bleu principal */
+    color: white; /* Texte en blanc */
+    border: none; /* Pas de bordure */
+    padding: 12px 25px; /* Espacement autour du texte */
+    border-radius: 8px; /* Coins arrondis */
+    font-size: 1.1rem; /* Taille de police légèrement plus grande */
+    font-weight: bold; /* Texte en gras */
+    cursor: pointer; /* Curseur en forme de main */
+    width: 100%; /* Prend toute la largeur du parent */
+    transition: all 0.3s ease-in-out; /* Transition fluide pour les changements */
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Ombre douce */
+    outline: none; /* Pas de contour au focus */
+  }
+  
+  /* Effet de survol */
+  .submit-button:hover {
+    background-color: #0056b3; /* Bleu plus foncé au survol */
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3); /* Ombre plus marquée */
+    transform: translateY(-2px); /* Légère élévation du bouton */
+  }
+  
+  /* Effet de clic */
+  .submit-button:active {
+    background-color: #004085; /* Bleu encore plus foncé au clic */
+    transform: translateY(2px); /* Le bouton descend légèrement */
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15); /* Ombre plus douce au clic */
+  }
+  
